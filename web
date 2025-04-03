@@ -1,0 +1,123 @@
+--------------------------------------------------------------------
+Using MD5 for Password Hashing
+--------------------------------------------------------------------
+Vulnerable Code:
+--------------------------------------------------------------------
+$password = "my_secure_password";
+$hashed_password = md5($password);
+--------------------------------------------------------------------
+Why It’s Vulnerable?
+--------------------------------------------------------------------
+MD5 is weak and susceptible to collision attacks.
+Fast hashing makes brute-force attacks easier.
+--------------------------------------------------------------------
+Secure Code:
+--------------------------------------------------------------------
+$password = "my_secure_password";
+$hashed_password = password_hash($password, PASSWORD_BCRYPT);
+--------------------------------------------------------------------
+Fix Explanation:
+--------------------------------------------------------------------
+Uses password_hash() with bcrypt, which is slow and computationally expensive, making brute-force harder.
+--------------------------------------------------------------------
+2. Using DES (Data Encryption Standard)
+--------------------------------------------------------------------
+Vulnerable Code:
+--------------------------------------------------------------------
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+
+public class WeakDESExample {
+    public static void main(String[] args) throws Exception {
+        String key = "12345678"; // 8-byte key (weak)
+        Cipher cipher = Cipher.getInstance("DES");
+        SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "DES");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+    }
+}
+--------------------------------------------------------------------
+Why It’s Vulnerable?
+--------------------------------------------------------------------
+DES uses a 56-bit key, which can be brute-forced in hours or days.
+--------------------------------------------------------------------
+Secure Code:
+--------------------------------------------------------------------
+Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "AES");
+cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+--------------------------------------------------------------------
+Fix Explanation:
+--------------------------------------------------------------------
+AES with GCM mode provides strong encryption and integrity protection.
+--------------------------------------------------------------------
+3. Using RSA with Small Key Sizes (e.g., 1024-bit)
+--------------------------------------------------------------------
+Vulnerable Code
+--------------------------------------------------------------------
+from Crypto.PublicKey import RSA
+
+key = RSA.generate(1024)  # Weak key size
+print(key.export_key().decode())
+--------------------------------------------------------------------
+Why It’s Vulnerable?
+--------------------------------------------------------------------
+1024-bit RSA is considered weak and can be factored using modern computing power.
+--------------------------------------------------------------------
+Secure Code:
+--------------------------------------------------------------------
+key = RSA.generate(4096)  # Stronger key size
+print(key.export_key().decode())
+--------------------------------------------------------------------
+Fix Explanation:
+--------------------------------------------------------------------
+4096-bit RSA is significantly more secure against factorization attacks.
+--------------------------------------------------------------------
+4. Using SHA-1 for Data Integrity
+--------------------------------------------------------------------
+Vulnerable Code:
+--------------------------------------------------------------------
+import hashlib
+
+data = b"important data"
+hash_value = hashlib.sha1(data).hexdigest()
+print(hash_value)
+--------------------------------------------------------------------
+Why It’s Vulnerable?
+--------------------------------------------------------------------
+SHA-1 has known collision vulnerabilities (Google demonstrated a collision attack in 2017).
+--------------------------------------------------------------------
+Secure Code:
+--------------------------------------------------------------------
+hash_value = hashlib.sha256(data).hexdigest()
+--------------------------------------------------------------------
+Fix Explanation:
+--------------------------------------------------------------------
+SHA-256 (or stronger like SHA-3) is more resistant to collisions.
+--------------------------------------------------------------------
+5. Using ECB Mode in Symmetric Encryption
+--------------------------------------------------------------------
+Vulnerable Code:
+--------------------------------------------------------------------
+from Crypto.Cipher import AES
+
+key = b"thisis16byteskey"
+cipher = AES.new(key, AES.MODE_ECB)
+ciphertext = cipher.encrypt(b"SensitiveData1234")
+--------------------------------------------------------------------
+Why It’s Vulnerable?
+--------------------------------------------------------------------
+ECB mode doesn’t randomize encryption (identical plaintexts produce identical ciphertexts), making pattern analysis easy.
+--------------------------------------------------------------------
+Secure Code:
+--------------------------------------------------------------------
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
+
+key = b"thisis16byteskey"
+iv = get_random_bytes(16)
+cipher = AES.new(key, AES.MODE_CBC, iv)
+ciphertext = cipher.encrypt(b"SensitiveData1234")
+--------------------------------------------------------------------
+Fix Explanation:
+--------------------------------------------------------------------
+CBC (Cipher Block Chaining) or GCM (Galois/Counter Mode) add randomness (IV or Nonce), making encryption more secure.
